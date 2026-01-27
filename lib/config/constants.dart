@@ -1,6 +1,6 @@
 class AppConstants {
   // API Configuration
-  static const String baseUrl = 'http://172.31.240.193:3000/api/mobile/monitor';
+  static const String baseUrl = 'http://172.31.246.61:3000/api/mobile/monitor';
 
   // Cambiar a tu IP del servidor en desarrollo
   // static const String baseUrl = 'http://192.168.1.100:3000/api/mobile/monitor';
