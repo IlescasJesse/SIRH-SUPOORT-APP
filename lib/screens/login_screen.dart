@@ -78,10 +78,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     // Logo
                     Container(
-                      width: 120,
-                      height: 120,
+                      width: 140,
+                      height: 140,
+                      padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryColor.withOpacity(0.2),
+                        color: Colors.white,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
@@ -91,10 +92,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ],
                       ),
-                      child: const Icon(
-                        Icons.people_alt_rounded,
-                        size: 60,
-                        color: AppTheme.primaryColor,
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/images/logo.png',
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 30),
@@ -128,7 +130,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: InputDecoration(
                         labelText: 'Usuario',
                         hintText: 'Ingresa tu usuario',
-                        prefixIcon: const Icon(Icons.person, color: AppTheme.primaryColor),
+                        prefixIcon: const Icon(Icons.person,
+                            color: AppTheme.primaryColor),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -145,14 +148,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: InputDecoration(
                         labelText: 'Contraseña',
                         hintText: 'Ingresa tu contraseña',
-                        prefixIcon: const Icon(Icons.lock, color: AppTheme.primaryColor),
+                        prefixIcon: const Icon(Icons.lock,
+                            color: AppTheme.primaryColor),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
                             color: AppTheme.textSecondary,
                           ),
                           onPressed: () {
-                            setState(() => _isPasswordVisible = !_isPasswordVisible);
+                            setState(
+                                () => _isPasswordVisible = !_isPasswordVisible);
                           },
                         ),
                       ),

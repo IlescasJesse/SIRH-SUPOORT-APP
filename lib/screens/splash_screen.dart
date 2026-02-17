@@ -13,29 +13,39 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+    with TickerProviderStateMixin {
+  late AnimationController _fadeController;
+  late AnimationController _shimmerController;
   late Animation<double> _fadeAnimation;
-  late Animation<double> _scaleAnimation;
+  late Animation<double> _shimmerAnimation;
 
   @override
   void initState() {
     super.initState();
 
-    _controller = AnimationController(
-      duration: const Duration(seconds: 2),
+    // Controlador para fade
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
+
+    // Controlador para efecto shimmer/resplandor
+    _shimmerController = AnimationController(
+      duration: const Duration(milliseconds: 1800),
       vsync: this,
     );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeIn),
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
+    _shimmerAnimation = Tween<double>(begin: -1.0, end: 2.0).animate(
+      CurvedAnimation(parent: _shimmerController, curve: Curves.easeInOut),
     );
 
-    _controller.forward();
+    // Iniciar animaciones
+    _fadeController.forward();
+    _shimmerController.repeat();
 
     _checkAuthentication();
   }
@@ -75,89 +85,51 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void dispose() {
-    _controller.dispose();
+    _fadeController.dispose();
+    _shimmerController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppTheme.backgroundColor,
-              AppTheme.surfaceColor,
-              AppTheme.primaryColor.withOpacity(0.1),
-            ],
-          ),
-        ),
-        child: Center(
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: ScaleTransition(
-              scale: _scaleAnimation,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Logo animado
-                  Container(
-                    width: 150,
-                    height: 150,
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryColor.withOpacity(0.2),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppTheme.primaryColor.withOpacity(0.5),
-                          blurRadius: 30,
-                          spreadRadius: 10,
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.people_alt_rounded,
-                      size: 80,
-                      color: AppTheme.primaryColor,
-                    ),
+      backgroundColor: AppTheme.primaryColor,
+      body: Center(
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: AnimatedBuilder(
+            animation: _shimmerController,
+            builder: (context, child) {
+              return ShaderMask(
+                shaderCallback: (bounds) {
+                  return LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: const [
+                      Colors.transparent,
+                      Colors.white54,
+                      Colors.transparent,
+                    ],
+                    stops: [
+                      _shimmerAnimation.value - 0.3,
+                      _shimmerAnimation.value,
+                      _shimmerAnimation.value + 0.3,
+                    ],
+                  ).createShader(bounds);
+                },
+                blendMode: BlendMode.srcATop,
+                child: Container(
+                  width: 200,
+                  height: 200,
+                  padding: const EdgeInsets.all(30),
+                  child: Image.asset(
+                    'assets/images/logo_white.png',
+                    fit: BoxFit.contain,
+                    color: Colors.white,
                   ),
-                  const SizedBox(height: 40),
-                  // Título
-                  Text(
-                    'SIRH',
-                    style: TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.textPrimary,
-                      letterSpacing: 4,
-                      shadows: [
-                        Shadow(
-                          color: AppTheme.primaryColor.withOpacity(0.5),
-                          blurRadius: 20,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Monitor de Recursos Humanos',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppTheme.textSecondary,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                  const SizedBox(height: 50),
-                  // Loading indicator
-                  const CircularProgressIndicator(
-                    color: AppTheme.primaryColor,
-                    strokeWidth: 3,
-                  ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),

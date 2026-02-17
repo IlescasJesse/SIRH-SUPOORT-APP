@@ -1,4 +1,4 @@
-package com.example.sirh_monitor
+package com.sirh.monitor
 
 import io.flutter.embedding.android.FlutterActivity
 
