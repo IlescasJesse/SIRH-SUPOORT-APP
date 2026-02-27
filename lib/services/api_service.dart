@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../config/constants.dart';
 import '../models/user_model.dart';
 import '../models/dashboard_model.dart';
 import '../models/agenda_log_model.dart';
+import 'storage_service.dart';
 
 class ApiService {
-  final storage = const FlutterSecureStorage();
+  final storage = StorageService();
   String? _token;
   String _baseUrl = AppConstants.baseUrl;
 
@@ -17,8 +17,9 @@ class ApiService {
   bool get isAuthenticated => _token != null;
 
   // Setters
-  void setBaseUrl(String url) {
+  Future<void> setBaseUrl(String url) async {
     _baseUrl = url;
+    await storage.write(AppConstants.serverUrlKey, url);
   }
 
   // Headers comunes
@@ -29,7 +30,10 @@ class ApiService {
 
   // Inicializar token desde storage
   Future<void> loadToken() async {
-    _token = await storage.read(key: AppConstants.tokenKey);
+    _token = await storage.read(AppConstants.tokenKey);
+    _baseUrl =
+        await storage.read(AppConstants.serverUrlKey) ?? AppConstants.baseUrl;
+
     print(
         'Token cargado: ${_token != null ? "Sí (${_token?.substring(0, 20)}...)" : "No"}');
   }
@@ -68,9 +72,8 @@ class ApiService {
 
         if (data['success'] == true) {
           _token = data['token'];
-          await storage.write(key: AppConstants.tokenKey, value: _token);
-          await storage.write(
-              key: AppConstants.userKey, value: jsonEncode(data['user']));
+          await storage.write(AppConstants.tokenKey, _token);
+          await storage.write(AppConstants.userKey, jsonEncode(data['user']));
 
           return {
             'success': true,
@@ -119,8 +122,8 @@ class ApiService {
   // Logout
   Future<void> logout() async {
     _token = null;
-    await storage.delete(key: AppConstants.tokenKey);
-    await storage.delete(key: AppConstants.userKey);
+    await storage.delete(AppConstants.tokenKey);
+    await storage.delete(AppConstants.userKey);
   }
 
   // Obtener Dashboard

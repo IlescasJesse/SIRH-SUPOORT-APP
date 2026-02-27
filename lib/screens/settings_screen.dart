@@ -18,7 +18,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _serverUrlController.text = AppConstants.baseUrl;
+    _serverUrlController.text = context.read<AppProvider>().apiService.baseUrl;
   }
 
   @override
@@ -183,8 +183,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
-                          provider.apiService
+                        onPressed: () async {
+                          await provider.apiService
                               .setBaseUrl(_serverUrlController.text);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(

@@ -1,4 +1,4 @@
-Add-Type -AssemblyName System.Drawing
+    Add-Type -AssemblyName System.Drawing
 
 $sourceIcon = "C:\Users\ilesm\Documents\ICONOS VARIOS SIRH\icon.png"
 $sizes = @{
